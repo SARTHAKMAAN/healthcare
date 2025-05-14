@@ -3,102 +3,321 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Health Tracker</title>
+    <title>HealthCareDashboard</title>
     <!-- Bootstrap 5 CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Animate.css for animations -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <!-- Remix Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@2.5.0/fonts/remixicon.css" rel="stylesheet">
     <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+        }
+        
         body {
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            background-color: #f9fafb;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
         }
         
         .hero-section {
-            padding: 3rem;
-            text-align: center;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
         }
         
-        .title {
+        .rounded-button {
+            border-radius: 9999px;
+        }
+        
+        .brand-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary);
+            border-radius: 50%;
+            color: white;
+        }
+        
+        .nav-link-custom {
+            color: #374151;
+            transition: color 0.2s ease;
+        }
+        
+        .nav-link-custom:hover {
+            color: var(--primary);
+        }
+        
+        .hero-content {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .hero-title {
             font-weight: 700;
-            color: #2c3e50;
-            margin-bottom: 1rem;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+            color: #111827;
+            margin-bottom: 1.5rem;
         }
         
-        .subtitle {
-            color: #7f8c8d;
-            font-size: 1.2rem;
+        .hero-description {
+            color: #4b5563;
+            font-size: 1.125rem;
             margin-bottom: 2rem;
+            max-width: 32rem;
         }
         
-        .btn-custom {
-            padding: 0.8rem 2rem;
-            border-radius: 50px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            transition: all 0.3s ease;
-            margin: 0 0.5rem;
-            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11);
+        .btn-primary-custom {
+            background-color: #111827;
+            color: white;
+            padding: 0.75rem 2rem;
+            font-weight: 500;
+            border-radius: 9999px;
+            transition: background-color 0.2s ease;
         }
         
-        .btn-login {
-            background-color: #3498db;
+        .btn-primary-custom:hover {
+            background-color: #1f2937;
             color: white;
         }
         
-        .btn-register {
-            background-color: #2ecc71;
-            color: white;
+        .btn-secondary-custom {
+            background-color: white;
+            border: 1px solid #d1d5db;
+            color: #1f2937;
+            padding: 0.75rem 2rem;
+            font-weight: 500;
+            border-radius: 9999px;
+            transition: background-color 0.2s ease;
         }
         
-        .btn-login:hover {
-            background-color: #2980b9;
-            transform: translateY(-2px);
-            box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1);
+        .btn-secondary-custom:hover {
+            background-color: #f9fafb;
+            color: #1f2937;
         }
         
-        .btn-register:hover {
-            background-color: #27ae60;
-            transform: translateY(-2px);
-            box-shadow: 0 7px 14px rgba(50, 50, 93, 0.1);
-        }
-        
-        @media (max-width: 576px) {
-            .hero-section {
-                padding: 2rem 1rem;
-            }
-            .button-group {
-                flex-direction: column;
-            }
-            .btn-custom {
-                margin: 0.5rem 0;
-                width: 100%;
+        @media (max-width: 767.98px) {
+            .hero-title {
+                font-size: 2.25rem;
             }
         }
     </style>
 </head>
-<body>
-    <div class="container">
-        <div class="hero-section animate__animated animate__fadeIn">
-            <h1 class="title display-4">Welcome to Health Tracker</h1>
-            <p class="subtitle lead">Track your daily health metrics and improve your wellbeing</p>
-            <div class="d-flex justify-content-center button-group">
-                <a href="/login" class="btn btn-custom btn-login animate__animated animate__pulse animate__delay-1s">
-                    <i class="bi bi-box-arrow-in-right me-2"></i>Login
-                </a>
-                <a href="/register" class="btn btn-custom btn-register animate__animated animate__pulse animate__delay-2s">
-                    <i class="bi bi-person-plus me-2"></i>Register
-                </a>
+<body class="bg-gray-50 min-h-screen">
+    <div class="hero-section">
+        <header class="w-100 py-3 px-4 px-md-5 d-flex align-items-center">
+            <div class="d-flex align-items-center me-3">
+                <div class="brand-icon me-2">
+                    <i class="ri-heart-pulse-line ri-lg"></i>
+                </div>
+                <span class="text-gray-800 fw-semibold">HealthCareDashboard</span>
+            </div>
+            <nav class="ms-auto d-none d-md-flex align-items-center gap-4">
+                <a href="#" class="nav-link-custom text-decoration-none">Features</a>
+                <a href="#" class="nav-link-custom text-decoration-none">How It Works</a>
+                <a href="#" class="nav-link-custom text-decoration-none">About Us</a>
+                <a href="#" class="nav-link-custom text-decoration-none">Contact</a>
+            </nav>
+        </header>
+
+        <div class="hero-content">
+            <div class="container">
+                <div class="row align-items-center">
+                    <div class="col-md-6 py-4 py-md-0">
+                        <h1 class="hero-title display-4 fw-bold mb-4">
+                            Track Your Health
+                        </h1>
+                        <p class="hero-description lead mb-4">
+                            Manage your health data, receive notifications & stay connected
+                            with your healthcare providers.
+                        </p>
+                        <div class="d-flex flex-wrap gap-3">
+                            <a href="/templates/register.html" class="btn btn-primary-custom">
+                                Register
+                            </a>
+                            <a href="/templates/login.html" class="btn btn-secondary-custom">
+                                Login
+                            </a>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <!-- Optional: Add an image here if needed -->
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- Add this section after the hero section -->
+<section class="py-5 py-md-7 bg-white">
+    <div class="container">
+        <div class="text-center mb-5 mb-md-7">
+            <h2 class="display-5 fw-bold mb-3">Why Choose Our Platform?</h2>
+            <p class="lead text-muted mx-auto" style="max-width: 700px;">
+                Experience a new way to manage your health journey with our comprehensive healthcare dashboard.
+            </p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Health Tracking Feature -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-4">
+                    <div class="card-body text-center">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 80px; height: 80px;">
+                            <i class="ri-heart-line ri-2x text-primary"></i>
+                        </div>
+                        <h3 class="h4 mb-3">Health Tracking</h3>
+                        <p class="text-muted mb-0">
+                            Monitor your vital signs, medications, and health metrics in one convenient dashboard.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Smart Notifications Feature -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-4">
+                    <div class="card-body text-center">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 80px; height: 80px;">
+                            <i class="ri-notification-3-line ri-2x text-primary"></i>
+                        </div>
+                        <h3 class="h4 mb-3">Smart Notifications</h3>
+                        <p class="text-muted mb-0">
+                            Receive timely reminders for appointments, medications, and important health updates.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Provider Connection Feature -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm p-4">
+                    <div class="card-body text-center">
+                        <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style="width: 80px; height: 80px;">
+                            <i class="ri-team-line ri-2x text-primary"></i>
+                        </div>
+                        <h3 class="h4 mb-3">Provider Connection</h3>
+                        <p class="text-muted mb-0">
+                            Stay connected with your healthcare team and share information securely.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="py-5 py-md-7" style="background-color: #f9fafb;">
+    <div class="container">
+        <div class="row justify-content-center text-center">
+            <div class="col-lg-8">
+                <h2 class="display-5 fw-bold mb-4 text-black">Ready to Start Your Health Journey?</h2>
+                <p class="lead mb-5 text-black-75">
+                    Join thousands of users who are already taking control of their health with our platform.
+                </p>
+                <div class="d-flex flex-wrap justify-content-center gap-3">
+                    <a href="/register" class="btn btn-light btn-lg px-4 rounded-pill fw-medium">
+                        Create Your Account
+                    </a>
+                    <a href="/demo" class="btn btn-outline-light btn-lg px-4 rounded-pill fw-medium">
+                        See How It Works
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Footer Section -->
+<footer class="bg-dark text-white pt-5 pb-4">
+    <div class="container">
+        <div class="row g-4">
+            <!-- Brand Info -->
+            <div class="col-lg-4 mb-4 mb-lg-0">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="bg-primary rounded-circle p-2 me-2">
+                        <i class="ri-heart-pulse-line ri-lg text-white"></i>
+                    </div>
+                    <span class="fs-5 fw-semibold text-white">HealthCareDashboard</span>
+                </div>
+                <p class="text-secondary">
+                    Your complete health management solution for a better, healthier life.
+                </p>
+            </div>
+
+            <!-- Company Links -->
+            <div class="col-sm-4 col-lg-2">
+                <h5 class="fs-6 fw-semibold mb-3 text-white">Company</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="/about" class="text-secondary text-decoration-none hover-text-white">About Us</a></li>
+                    <li class="mb-2"><a href="/careers" class="text-secondary text-decoration-none hover-text-white">Careers</a></li>
+                    <li class="mb-2"><a href="/press" class="text-secondary text-decoration-none hover-text-white">Press</a></li>
+                    <li><a href="/blog" class="text-secondary text-decoration-none hover-text-white">Blog</a></li>
+                </ul>
+            </div>
+
+            <!-- Support Links -->
+            <div class="col-sm-4 col-lg-2">
+                <h5 class="fs-6 fw-semibold mb-3 text-white">Support</h5>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><a href="/help" class="text-secondary text-decoration-none hover-text-white">Help Center</a></li>
+                    <li class="mb-2"><a href="/contact" class="text-secondary text-decoration-none hover-text-white">Contact Us</a></li>
+                    <li class="mb-2"><a href="/privacy" class="text-secondary text-decoration-none hover-text-white">Privacy Policy</a></li>
+                    <li><a href="/terms" class="text-secondary text-decoration-none hover-text-white">Terms of Service</a></li>
+                </ul>
+            </div>
+
+            <!-- Newsletter -->
+            <div class="col-sm-4 col-lg-4">
+                <h5 class="fs-6 fw-semibold mb-3 text-white">Stay Connected</h5>
+                <p class="text-secondary mb-3">Subscribe to our newsletter for updates</p>
+                <form class="mb-3">
+                    <div class="input-group">
+                        <input type="email" class="form-control bg-gray-800 border-gray-700 text-white" placeholder="Your email" aria-label="Your email">
+                        <button class="btn btn-primary" type="submit">Subscribe</button>
+                    </div>
+                </form>
+                <div class="d-flex gap-3">
+                    <a href="#" class="text-secondary hover-text-white"><i class="ri-facebook-fill ri-lg"></i></a>
+                    <a href="#" class="text-secondary hover-text-white"><i class="ri-twitter-fill ri-lg"></i></a>
+                    <a href="#" class="text-secondary hover-text-white"><i class="ri-instagram-line ri-lg"></i></a>
+                    <a href="#" class="text-secondary hover-text-white"><i class="ri-linkedin-fill ri-lg"></i></a>
+                </div>
+            </div>
+        </div>
+        <hr class="my-4 border-secondary">
+        <div class="text-center text-secondary">
+            <small>&copy; 2023 HealthCareDashboard. All rights reserved.</small>
+        </div>
+    </div>
+</footer>
+
+<style>
+    /* Custom Styles */
+    .text-white-75 {
+        color: rgba(255, 255, 255, 0.75);
+    }
+    
+    .hover-text-white:hover {
+        color: white !important;
+    }
+    
+    .bg-gray-800 {
+        background-color: #1f2937;
+    }
+    
+    .border-gray-700 {
+        border-color: #374151;
+    }
+    
+    .text-secondary {
+        color: #9ca3af !important;
+    }
+</style>
+
     <!-- Bootstrap JS Bundle with Popper -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
