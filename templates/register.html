@@ -1,279 +1,204 @@
-<<<<<<< HEAD
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Register | Health Tracker</title>
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Bootstrap Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    <!-- Animate.css -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
-    <style>
-        body {
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-        }
-        
-        .register-card {
-            max-width: 500px;
-            margin: 0 auto;
-            padding: 2.5rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            background: white;
-            animation: fadeInUp 0.6s ease-out;
-        }
-        
-        .register-header {
-            text-align: center;
-            margin-bottom: 2rem;
-            position: relative;
-            padding-bottom: 1rem;
-        }
-        
-        .register-header h2 {
-            font-weight: 700;
-            color: #2c3e50;
-        }
-        
-        .register-header::after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80px;
-            height: 3px;
-            background: linear-gradient(90deg, #3498db, #2ecc71);
-        }
-        
-        .form-control {
-            padding: 0.8rem 1.2rem;
-            border-radius: 8px;
-            border: 1px solid #e0e0e0;
-            transition: all 0.3s;
-            margin-bottom: 1.5rem;
-        }
-        
-        .form-control:focus {
-            border-color: #3498db;
-            box-shadow: 0 0 0 0.25rem rgba(52, 152, 219, 0.25);
-        }
-        
-        .input-group-text {
-            background: transparent;
-            border-right: none;
-        }
-        
-        .input-with-icon {
-            border-left: none !important;
-        }
-        
-        .btn-register {
-            background: linear-gradient(135deg, #2ecc71 0%, #3498db 100%);
-            border: none;
-            padding: 0.8rem;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-            border-radius: 8px;
-            width: 100%;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(46, 204, 113, 0.3);
-        }
-        
-        .btn-register:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 7px 20px rgba(46, 204, 113, 0.4);
-        }
-        
-        .password-strength {
-            height: 5px;
-            background: #f1f1f1;
-            border-radius: 5px;
-            margin-top: -10px;
-            margin-bottom: 15px;
-            overflow: hidden;
-        }
-        
-        .password-strength-bar {
-            height: 100%;
-            width: 0%;
-            background: #e74c3c;
-            transition: width 0.3s;
-        }
-        
-        .login-link {
-            text-align: center;
-            margin-top: 1.5rem;
-            color: #7f8c8d;
-        }
-        
-        .login-link a {
-            color: #3498db;
-            font-weight: 500;
-            text-decoration: none;
-        }
-        
-        .terms-text {
-            font-size: 0.8rem;
-            color: #95a5a6;
-            text-align: center;
-            margin-top: 1rem;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Register - Health Track</title>
+<script src="https://cdn.tailwindcss.com/3.4.16"></script>
+<script>tailwind.config={theme:{extend:{colors:{primary:'#4F46E5',secondary:'#10B981'},borderRadius:{'none':'0px','sm':'4px',DEFAULT:'8px','md':'12px','lg':'16px','xl':'20px','2xl':'24px','3xl':'32px','full':'9999px','button':'8px'}}}}</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/remixicon/4.6.0/remixicon.min.css">
+<style>
+:where([class^="ri-"])::before { content: "\f3c2"; }
+body {
+font-family: 'Inter', sans-serif;
+background-color: #f9fafb;
+}
+input:focus {
+outline: none;
+border-color: #4F46E5;
+transition: border-color 0.2s ease;
+}
+.form-container {
+animation: fadeIn 0.5s ease-in-out;
+}
+@keyframes fadeIn {
+from { opacity: 0; transform: translateY(10px); }
+to { opacity: 1; transform: translateY(0); }
+}
+.toggle-password {
+cursor: pointer;
+}
+input[type="checkbox"] {
+appearance: none;
+-webkit-appearance: none;
+width: 18px;
+height: 18px;
+border: 1px solid #d1d5db;
+border-radius: 4px;
+outline: none;
+cursor: pointer;
+position: relative;
+}
+input[type="checkbox"]:checked {
+background-color: #4F46E5;
+border-color: #4F46E5;
+}
+input[type="checkbox"]:checked::after {
+content: "";
+position: absolute;
+top: 3px;
+left: 6px;
+width: 5px;
+height: 10px;
+border: solid white;
+border-width: 0 2px 2px 0;
+transform: rotate(45deg);
+}
+</style>
 </head>
-<body>
-    <div class="container">
-        <div class="register-card animate__animated animate__fadeInUp">
-            <div class="register-header">
-                <h2>Create Your Account</h2>
-                <p class="text-muted">Start tracking your health journey today</p>
-            </div>
-            
-            <form method="POST">
-                <!-- Username -->
-                <div class="input-group mb-4">
-                    <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
-                    <input type="text" name="username" class="form-control input-with-icon" placeholder="Choose a username" required>
-                </div>
-                
-                <!-- Password -->
-                <div class="mb-3">
-                    <div class="input-group">
-                        <span class="input-group-text"><i class="bi bi-lock-fill"></i></span>
-                        <input type="password" name="password" id="password" class="form-control input-with-icon" placeholder="Create a password" required>
-                        <button class="btn btn-outline-secondary" type="button" id="togglePassword">
-                            <i class="bi bi-eye"></i>
-                        </button>
-                    </div>
-                    <div class="password-strength">
-                        <div class="password-strength-bar" id="passwordStrength"></div>
-                    </div>
-                    <div class="form-text">Use 8+ characters with a mix of letters, numbers & symbols</div>
-                </div>
-                
-                <button type="submit" class="btn btn-success btn-register animate__animated animate__pulse animate__delay-1s">
-                    <i class="bi bi-person-plus-fill me-2"></i> Register
-                </button>
-                
-                <div class="terms-text">
-                    By registering, you agree to our <a href="#" data-bs-toggle="modal" data-bs-target="#termsModal">Terms of Service</a>
-                </div>
-                
-                <div class="login-link mt-3">
-                    Already have an account? <a href="/login">Login here</a>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Terms Modal -->
-    <div class="modal fade" id="termsModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Terms of Service</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>This is a sample terms of service agreement. Replace with your actual terms.</p>
-                    <p>By using Health Tracker, you agree to:</p>
-                    <ul>
-                        <li>Provide accurate information</li>
-                        <li>Keep your credentials secure</li>
-                        <li>Use the service responsibly</li>
-                    </ul>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bootstrap JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script>
-        // Password visibility toggle
-        const togglePassword = document.querySelector('#togglePassword');
-        const password = document.querySelector('#password');
-        
-        togglePassword.addEventListener('click', function() {
-            const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
-            password.setAttribute('type', type);
-            this.innerHTML = type === 'password' ? '<i class="bi bi-eye"></i>' : '<i class="bi bi-eye-slash"></i>';
-        });
-        
-        // Password strength indicator
-        password.addEventListener('input', function() {
-            const strengthBar = document.querySelector('#passwordStrength');
-            const strength = calculatePasswordStrength(this.value);
-            
-            if (strength < 30) {
-                strengthBar.style.backgroundColor = '#e74c3c';
-            } else if (strength < 70) {
-                strengthBar.style.backgroundColor = '#f39c12';
-            } else {
-                strengthBar.style.backgroundColor = '#2ecc71';
-            }
-            
-            strengthBar.style.width = strength + '%';
-        });
-        
-        function calculatePasswordStrength(password) {
-            let strength = 0;
-            
-            // Length contributes up to 40%
-            strength += Math.min(password.length / 20 * 40, 40);
-            
-            // Character variety contributes up to 60%
-            if (password.match(/[a-z]/)) strength += 10;
-            if (password.match(/[A-Z]/)) strength += 10;
-            if (password.match(/[0-9]/)) strength += 10;
-            if (password.match(/[^a-zA-Z0-9]/)) strength += 10;
-            
-            // Deduct for weak patterns
-            if (password.length < 6) strength -= 20;
-            if (password === password.toLowerCase()) strength -= 10;
-            
-            return Math.min(Math.max(strength, 0), 100);
-        }
-        
-        // Add animation on focus
-        document.querySelectorAll('.form-control').forEach(input => {
-            input.addEventListener('focus', function() {
-                this.parentElement.parentElement.classList.add('animate__animated', 'animate__pulse');
-            });
-            
-            input.addEventListener('blur', function() {
-                this.parentElement.parentElement.classList.remove('animate__animated', 'animate__pulse');
-            });
-        });
-    </script>
+<body class="min-h-screen flex flex-col justify-center items-center p-4 md:p-6">
+<div class="form-container w-full max-w-md mx-auto bg-white rounded-lg shadow-lg p-6 md:p-8">
+<div class="text-center mb-8">
+<h1 class="font-['Pacifico'] text-3xl text-primary mb-2">Health Tracker</h1>
+<p class="text-gray-600">Create your account to start your health journey</p>
+</div>
+<form class="space-y-4">
+<div class="grid grid-cols-2 gap-4">
+<div class="relative">
+<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none w-10 h-full">
+<i class="ri-user-line text-gray-400"></i>
+</div>
+<input type="text" class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded text-gray-900 focus:ring-2 focus:ring-primary/20" placeholder="First name" required>
+</div>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none w-10 h-full">
+<i class="ri-user-line text-gray-400"></i>
+</div>
+<input type="text" class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded text-gray-900 focus:ring-2 focus:ring-primary/20" placeholder="Last name" required>
+</div>
+</div>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none w-10 h-full">
+<i class="ri-mail-line text-gray-400"></i>
+</div>
+<input type="email" class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded text-gray-900 focus:ring-2 focus:ring-primary/20" placeholder="Email address" required>
+</div>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none w-10 h-full">
+<i class="ri-calendar-line text-gray-400"></i>
+</div>
+<input type="date" class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded text-gray-900 focus:ring-2 focus:ring-primary/20" required>
+</div>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none w-10 h-full">
+<i class="ri-lock-line text-gray-400"></i>
+</div>
+<input type="password" id="password" class="w-full pl-10 pr-10 py-3 bg-gray-50 border border-gray-300 rounded text-gray-900 focus:ring-2 focus:ring-primary/20" placeholder="Password" required>
+<div class="absolute inset-y-0 right-0 flex items-center pr-3 w-10 h-full">
+<i class="ri-eye-line text-gray-400 toggle-password" id="togglePassword"></i>
+</div>
+</div>
+<div class="relative">
+<div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none w-10 h-full">
+<i class="ri-lock-line text-gray-400"></i>
+</div>
+<input type="password" id="confirmPassword" class="w-full pl-10 pr-10 py-3 bg-gray-50 border border-gray-300 rounded text-gray-900 focus:ring-2 focus:ring-primary/20" placeholder="Confirm password" required>
+<div class="absolute inset-y-0 right-0 flex items-center pr-3 w-10 h-full">
+<i class="ri-eye-line text-gray-400 toggle-password" id="toggleConfirmPassword"></i>
+</div>
+</div>
+<div class="space-y-3">
+<p class="text-sm font-medium text-gray-700">What are your health goals?</p>
+<div class="flex flex-wrap gap-2">
+<button type="button" class="px-4 py-2 rounded-full border border-gray-300 text-sm font-medium text-gray-700 hover:bg-primary hover:text-white hover:border-primary transition-colors whitespace-nowrap goal-btn">Weight Loss</button>
+<button type="button" class="px-4 py-2 rounded-full border border-gray-300 text-sm font-medium text-gray-700 hover:bg-primary hover:text-white hover:border-primary transition-colors whitespace-nowrap goal-btn">Muscle Gain</button>
+<button type="button" class="px-4 py-2 rounded-full border border-gray-300 text-sm font-medium text-gray-700 hover:bg-primary hover:text-white hover:border-primary transition-colors whitespace-nowrap goal-btn">Better Sleep</button>
+<button type="button" class="px-4 py-2 rounded-full border border-gray-300 text-sm font-medium text-gray-700 hover:bg-primary hover:text-white hover:border-primary transition-colors whitespace-nowrap goal-btn">Mental Health</button>
+</div>
+</div>
+<div class="flex items-start">
+<div class="flex items-center h-5">
+<input type="checkbox" id="terms" class="mr-2" required>
+</div>
+<label for="terms" class="text-sm text-gray-600">
+I agree to the <a href="#" class="text-primary hover:text-primary/80">Terms of Service</a> and <a href="#" class="text-primary hover:text-primary/80">Privacy Policy</a>
+</label>
+</div>
+<button type="submit" class="w-full py-3 bg-primary text-white font-medium rounded-button hover:bg-primary/90 transition-colors whitespace-nowrap">
+Create Account
+</button>
+</form>
+<div class="my-6 flex items-center">
+<div class="flex-1 h-px bg-gray-200"></div>
+<p class="mx-4 text-sm text-gray-500">Or continue with</p>
+<div class="flex-1 h-px bg-gray-200"></div>
+</div>
+<div class="grid grid-cols-3 gap-3">
+<button class="flex items-center justify-center py-2.5 border border-gray-300 rounded-button hover:bg-gray-50 transition-colors whitespace-nowrap">
+<div class="w-5 h-5 flex items-center justify-center mr-2">
+<i class="ri-google-fill text-[#EA4335]"></i>
+</div>
+<span class="text-sm font-medium text-gray-700">Google</span>
+</button>
+<button class="flex items-center justify-center py-2.5 border border-gray-300 rounded-button hover:bg-gray-50 transition-colors whitespace-nowrap">
+<div class="w-5 h-5 flex items-center justify-center mr-2">
+<i class="ri-facebook-fill text-[#1877F2]"></i>
+</div>
+<span class="text-sm font-medium text-gray-700">Facebook</span>
+</button>
+<button class="flex items-center justify-center py-2.5 border border-gray-300 rounded-button hover:bg-gray-50 transition-colors whitespace-nowrap">
+<div class="w-5 h-5 flex items-center justify-center mr-2">
+<i class="ri-apple-fill text-[#000000]"></i>
+</div>
+<span class="text-sm font-medium text-gray-700">Apple</span>
+</button>
+</div>
+<div class="mt-8 text-center">
+<p class="text-gray-600">
+Already have an account?
+<a href="#" class="text-primary font-medium hover:text-primary/80">Sign in</a>
+</p>
+</div>
+</div>
+<footer class="w-full max-w-md mx-auto mt-8 text-center text-sm text-gray-500">
+<div class="flex justify-center space-x-4 mb-2">
+<a href="#" class="hover:text-gray-700">Terms of Service</a>
+<a href="#" class="hover:text-gray-700">Privacy Policy</a>
+</div>
+<p>© 2025 Health Track. All rights reserved.</p>
+</footer>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+const togglePassword = document.getElementById('togglePassword');
+const toggleConfirmPassword = document.getElementById('toggleConfirmPassword');
+const password = document.getElementById('password');
+const confirmPassword = document.getElementById('confirmPassword');
+const goalButtons = document.querySelectorAll('.goal-btn');
+function togglePasswordVisibility(inputField, toggleIcon) {
+const type = inputField.getAttribute('type') === 'password' ? 'text' : 'password';
+inputField.setAttribute('type', type);
+if (type === 'password') {
+toggleIcon.classList.remove('ri-eye-off-line');
+toggleIcon.classList.add('ri-eye-line');
+} else {
+toggleIcon.classList.remove('ri-eye-line');
+toggleIcon.classList.add('ri-eye-off-line');
+}
+}
+togglePassword.addEventListener('click', () => togglePasswordVisibility(password, togglePassword));
+toggleConfirmPassword.addEventListener('click', () => togglePasswordVisibility(confirmPassword, toggleConfirmPassword));
+goalButtons.forEach(button => {
+button.addEventListener('click', function() {
+this.classList.toggle('bg-primary');
+this.classList.toggle('text-white');
+this.classList.toggle('border-primary');
+});
+});
+});
+</script>
 </body>
 </html>
-=======
-<!-- templates/register.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Register</title>
-</head>
-<body>
-    <h2>Register</h2>
-    <form method="POST">
-        Username: <input type="text" name="username" required><br><br>
-        Password: <input type="password" name="password" required><br><br>
-        <input type="submit" value="Register">
-    </form>
-    <p>Already have an account? <a href="/login">Login here</a></p>
-</body>
-</html>
- 
->>>>>>> 96cc0499af803d9666e1418f4ea418f22480aae5

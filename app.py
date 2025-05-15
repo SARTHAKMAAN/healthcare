@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 from flask import Flask, render_template, request, redirect, url_for, session, flash
 from werkzeug.security import generate_password_hash, check_password_hash
 
@@ -105,7 +105,7 @@ def logout():
 
 if __name__ == '__main__':
     app.run(debug=True)
-=======
+
 
 from flask import Flask, render_template, request, redirect, session
 from utils.db import get_db_connection 
@@ -195,5 +195,4 @@ if __name__ == '__main__':
    app.run(debug=True, host='127.0.0.1', port=5000)
 
 
-    
->>>>>>> 96cc0499af803d9666e1418f4ea418f22480aae5
+
