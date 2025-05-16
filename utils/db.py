@@ -6,8 +6,19 @@ def get_db_connection():
         user="root",
         password="Password@1",
         database="health_tracker"
-<<<<<<< HEAD
     )
-=======
-    )
->>>>>>> 96cc0499af803d9666e1418f4ea418f22480aae5
+import mysql.connector
+
+def get_db_connection():
+    try:
+        conn = mysql.connector.connect(
+            host='localhost',
+            user='your_mysql_username',
+            password='your_mysql_password',
+            database='health_tracker'
+        )
+        return conn
+    except mysql.connector.Error as err:
+        print(f"Database connection error: {err}")
+        return None
+

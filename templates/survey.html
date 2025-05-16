@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Health Assessment</title>
+    <style>
+        :root {
+            --primary: #4285f4;
+            --primary-dark: #3367d6;
+            --secondary: #f1f3f4;
+            --text: #202124;
+            --text-light: #5f6368;
+            --border: #dadce0;
+            --success: #34a853;
+            --white: #ffffff;
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Google Sans', Roboto, Arial, sans-serif;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            color: var(--text);
+            line-height: 1.6;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        
+        .survey-container {
+            background-color: var(--white);
+            border-radius: 16px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 640px;
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 4px;
+            background-color: var(--secondary);
+            border-radius: 2px;
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            font-size: 14px;
+            color: var(--text-light);
+            margin-bottom: 8px;
+        }
+        
+        .survey-card {
+            transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+            position: absolute;
+            width: calc(100% - 64px);
+            padding: 16px 0;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateX(100%);
+        }
+        
+        .survey-card.active {
+            opacity: 1;
+            pointer-events: all;
+            position: relative;
+            transform: translateX(0);
+        }
+        
+        .survey-card.leaving {
+            transform: translateX(-100%);
+        }
+        
+        h2 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+        
+        .subtitle {
+            font-size: 16px;
+            color: var(--text-light);
+            margin-bottom: 24px;
+        }
+        
+        .form-group {
+            margin-bottom: 24px;
+        }
+        
+        label {
+            display: block;
+            font-size: 16px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+        
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.2s;
+        }
+        
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(66, 133, 244, 0.2);
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .checkbox-option,
+        .radio-option {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .checkbox-option input,
+        .radio-option input {
+            margin-right: 12px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .checkbox-label,
+        .radio-label {
+            font-size: 16px;
+            color: var(--text);
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 16px;
+            margin-top: 12px;
+        }
+        
+        .radio-group .radio-option {
+            flex: 1;
+        }
+        
+        .btn-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 32px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary);
+        }
+        
+        .btn-secondary:hover {
+            background-color: var(--secondary);
+        }
+        
+        .summary-section {
+            background-color: var(--secondary);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 24px 0;
+        }
+        
+        .summary-section h3 {
+            margin-bottom: 16px;
+            font-size: 18px;
+        }
+        
+        .summary-section ul {
+            list-style-type: none;
+        }
+        
+        .summary-section li {
+            margin-bottom: 12px;
+            padding-left: 24px;
+            position: relative;
+        }
+        
+        .summary-section li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: var(--success);
+            font-weight: bold;
+        }
+        
+        .recommendations {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+        
+        .recommendations h4 {
+            margin-bottom: 12px;
+            font-size: 16px;
+        }
+        
+        @media (max-width: 600px) {
+            .survey-container {
+                padding: 24px;
+            }
+            
+            .survey-card {
+                width: calc(100% - 48px);
+            }
+            
+            .radio-group {
+                flex-direction: column;
+                gap: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="survey-container">
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+        <p class="progress-text" id="progress-text">1 of 8</p>
+        
+        <!-- Card 1: Personal Introduction -->
+        <div class="survey-card active" id="card-1">
+            <h2>Welcome, <span id="user-name">Sarah</span>!</h2>
+            <p class="subtitle">Let's get to know you better to personalize your health experience</p>
+            
+            <div class="form-group">
+                <label for="preferred-name">What should we call you?</label>
+                <input type="text" id="preferred-name" placeholder="Your preferred name">
+            </div>
+            
+            <div class="form-group">
+                <label>Which best describes you?</label>
+                <div class="options-container">
+                    <div class="radio-option">
+                        <input type="radio" id="role-patient" name="role" value="Patient" checked>
+                        <label class="radio-label" for="role-patient">Patient</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="role-caregiver" name="role" value="Caregiver">
+                        <label class="radio-label" for="role-caregiver">Caregiver</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="role-professional" name="role" value="Health Professional">
+                        <label class="radio-label" for="role-professional">Health Professional</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="btn-container">
+                <button class="btn btn-primary" onclick="nextCard()">Continue</button>
+            </div>
+            
+            <p class="subtitle">You can always update these preferences later in your account settings.</p>
+        </div>
+        
+        <!-- Card 2: Preferences -->
+        <div class="survey-card" id="card-2">
+            <h2>Your Preferences</h2>
+            <p class="subtitle">Help us customize your health experience</p>
+            
+            <div class="form-group">
+                <label>Which theme do you prefer?</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="theme-light" name="theme" value="Light Mode" checked>
+                        <label class="radio-label" for="theme-light">Light Mode</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="theme-dark" name="theme" value="Dark Mode">
+                        <label class="radio-label" for="theme-dark">Dark Mode</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>How often would you like health reminders?</label>
+                <div class="options-container">
+                    <div class="radio-option">
+                        <input type="radio" id="reminders-real-time" name="reminders" value="Real-time updates">
+                        <label class="radio-label" for="reminders-real-time">Real-time updates</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="reminders-daily" name="reminders" value="Daily digest" checked>
+                        <label class="radio-label" for="reminders-daily">Daily digest</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="reminders-weekly" name="reminders" value="Weekly summary">
+                        <label class="radio-label" for="reminders-weekly">Weekly summary</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="reminders-important" name="reminders" value="Only important alerts">
+                        <label class="radio-label" for="reminders-important">Only critical alerts</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="btn-container">
+                <button class="btn btn-secondary" onclick="prevCard()">Back</button>
+                <button class="btn btn-primary" onclick="nextCard()">Continue</button>
+            </div>
+        </div>
+        
+        <!-- Card 3: Health Interests -->
+        <div class="survey-card" id="card-3">
+            <h2>Your Health Interests</h2>
+            <p class="subtitle">Tell us what health topics interest you</p>
+            
+            <div class="form-group">
+                <label>Select health topics you're interested in (choose at least 3)</label>
+                <div class="options-container">
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="interest-nutrition" name="interests" value="Nutrition & Diet">
+                        <label class="checkbox-label" for="interest-nutrition">Nutrition & Diet</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="interest-exercise" name="interests" value="Exercise Programs">
+                        <label class="checkbox-label" for="interest-exercise">Exercise Programs</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="interest-mental" name="interests" value="Mental Health">
+                        <label class="checkbox-label" for="interest-mental">Mental Health</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="interest-chronic" name="interests" value="Chronic Condition Management">
+                        <label class="checkbox-label" for="interest-chronic">Chronic Condition Management</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="interest-preventive" name="interests" value="Preventive Care">
+                        <label class="checkbox-label" for="interest-preventive">Preventive Care</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="interest-alternative" name="interests" value="Alternative Medicine">
+                        <label class="checkbox-label" for="interest-alternative">Alternative Medicine</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="interest-womens" name="interests" value="Women's Health">
+                        <label class="checkbox-label" for="interest-womens">Women's Health</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="interest-senior" name="interests" value="Senior Health">
+                        <label class="checkbox-label" for="interest-senior">Senior Health</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="btn-container">
+                <button class="btn btn-secondary" onclick="prevCard()">Back</button>
+                <button class="btn btn-primary" onclick="nextCard()">Continue</button>
+            </div>
+        </div>
+        
+        <!-- Card 4: Experience Level -->
+        <div class="survey-card" id="card-4">
+            <h2>Your Health Experience</h2>
+            <p class="subtitle">Help us tailor content to your needs</p>
+            
+            <div class="form-group">
+                <label>How would you rate your health knowledge?</label>
+                <div class="radio-group">
+                    <div class="radio-option">
+                        <input type="radio" id="knowledge-beginner" name="knowledge" value="Beginner">
+                        <label class="radio-label" for="knowledge-beginner">Beginner</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="knowledge-intermediate" name="knowledge" value="Intermediate" checked>
+                        <label class="radio-label" for="knowledge-intermediate">Intermediate</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="knowledge-expert" name="knowledge" value="Expert">
+                        <label class="radio-label" for="knowledge-expert">Expert</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>How long have you managed your health condition?</label>
+                <div class="options-container">
+                    <div class="radio-option">
+                        <input type="radio" id="experience-new" name="experience" value="Newly diagnosed (<6 months)">
+                        <label class="radio-label" for="experience-new">Newly diagnosed (&lt;6 months)</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="experience-1-2" name="experience" value="6 months - 2 years">
+                        <label class="radio-label" for="experience-1-2">6 months - 2 years</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="experience-2-5" name="experience" value="2-5 years" checked>
+                        <label class="radio-label" for="experience-2-5">2-5 years</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="experience-5plus" name="experience" value="5+ years">
+                        <label class="radio-label" for="experience-5plus">5+ years</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="btn-container">
+                <button class="btn btn-secondary" onclick="prevCard()">Back</button>
+                <button class="btn btn-primary" onclick="nextCard()">Continue</button>
+            </div>
+        </div>
+        
+        <!-- Card 5: Availability -->
+        <div class="survey-card" id="card-5">
+            <h2>Your Health Routine</h2>
+            <p class="subtitle">When do you typically manage your health?</p>
+            
+            <div class="form-group">
+                <label>Which days do you typically track your health? (Select all that apply)</label>
+                <div class="options-container">
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="day-monday" name="days" value="Monday">
+                        <label class="checkbox-label" for="day-monday">Monday</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="day-tuesday" name="days" value="Tuesday">
+                        <label class="checkbox-label" for="day-tuesday">Tuesday</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="day-wednesday" name="days" value="Wednesday">
+                        <label class="checkbox-label" for="day-wednesday">Wednesday</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="day-thursday" name="days" value="Thursday">
+                        <label class="checkbox-label" for="day-thursday">Thursday</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="day-friday" name="days" value="Friday">
+                        <label class="checkbox-label" for="day-friday">Friday</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="day-saturday" name="days" value="Saturday">
+                        <label class="checkbox-label" for="day-saturday">Saturday</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="day-sunday" name="days" value="Sunday">
+                        <label class="checkbox-label" for="day-sunday">Sunday</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>When do you prefer to manage health activities?</label>
+                <div class="options-container">
+                    <div class="radio-option">
+                        <input type="radio" id="time-morning" name="time" value="Morning (5am-9am)">
+                        <label class="radio-label" for="time-morning">Morning (5am-9am)</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="time-midday" name="time" value="Mid-day (9am-2pm)">
+                        <label class="radio-label" for="time-midday">Mid-day (9am-2pm)</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="time-afternoon" name="time" value="Afternoon (2pm-6pm)" checked>
+                        <label class="radio-label" for="time-afternoon">Afternoon (2pm-6pm)</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="time-evening" name="time" value="Evening (6pm-10pm)">
+                        <label class="radio-label" for="time-evening">Evening (6pm-10pm)</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="time-night" name="time" value="Night (10pm-5am)">
+                        <label class="radio-label" for="time-night">Night (10pm-5am)</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="btn-container">
+                <button class="btn btn-secondary" onclick="prevCard()">Back</button>
+                <button class="btn btn-primary" onclick="nextCard()">Continue</button>
+            </div>
+        </div>
+        
+        <!-- Card 6: Communication Preferences -->
+        <div class="survey-card" id="card-6">
+            <h2>Health Communication</h2>
+            <p class="subtitle">How would you like us to keep in touch?</p>
+            
+            <div class="form-group">
+                <label>Enable notifications for:</label>
+                <div class="options-container">
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="notif-meds" name="notifications" value="Medication reminders" checked>
+                        <label class="checkbox-label" for="notif-meds">Medication reminders</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="notif-tips" name="notifications" value="Weekly health tips" checked>
+                        <label class="checkbox-label" for="notif-tips">Weekly health tips</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="notif-appointments" name="notifications" value="Appointment alerts" checked>
+                        <label class="checkbox-label" for="notif-appointments">Appointment alerts</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="notif-results" name="notifications" value="Test result availability">
+                        <label class="checkbox-label" for="notif-results">Test result availability</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="notif-education" name="notifications" value="Health education">
+                        <label class="checkbox-label" for="notif-education">Health education</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Preferred communication method:</label>
+                <div class="options-container">
+                    <div class="radio-option">
+                        <input type="radio" id="comm-email" name="communication" value="Email" checked>
+                        <label class="radio-label" for="comm-email">Email (HIPAA-compliant)</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="comm-portal" name="communication" value="Patient portal">
+                        <label class="radio-label" for="comm-portal">Patient portal</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="comm-sms" name="communication" value="Text messages">
+                        <label class="radio-label" for="comm-sms">Text messages</label>
+                    </div>
+                    <div class="radio-option">
+                        <input type="radio" id="comm-calls" name="communication" value="Voice calls">
+                        <label class="radio-label" for="comm-calls">Voice calls</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="btn-container">
+                <button class="btn btn-secondary" onclick="prevCard()">Back</button>
+                <button class="btn btn-primary" onclick="nextCard()">Continue</button>
+            </div>
+        </div>
+        
+        <!-- Card 7: Health Goals -->
+        <div class="survey-card" id="card-7">
+            <h2>Your Health Goals</h2>
+            <p class="subtitle">What are you hoping to achieve?</p>
+            
+            <div class="form-group">
+                <label>What are your primary health goals? (Select up to 3)</label>
+                <div class="options-container">
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="goal-fitness" name="goals" value="Improve physical fitness">
+                        <label class="checkbox-label" for="goal-fitness">Improve physical fitness</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="goal-condition" name="goals" value="Manage chronic condition(s)">
+                        <label class="checkbox-label" for="goal-condition">Manage chronic condition(s)</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="goal-stress" name="goals" value="Reduce stress/anxiety">
+                        <label class="checkbox-label" for="goal-stress">Reduce stress/anxiety</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="goal-sleep" name="goals" value="Improve sleep quality">
+                        <label class="checkbox-label" for="goal-sleep">Improve sleep quality</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="goal-weight" name="goals" value="Lose/gain weight">
+                        <label class="checkbox-label" for="goal-weight">Lose/gain weight</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="goal-habits" name="goals" value="Quit smoking/drinking">
+                        <label class="checkbox-label" for="goal-habits">Quit smoking/drinking</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="goal-other" name="goals" value="Other">
+                        <label class="checkbox-label" for="goal-other">Other</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Any specific health targets? (Optional)</label>
+                <textarea id="specific-goals" placeholder="Describe your personal health objectives..."></textarea>
+            </div>
+            
+            <div class="btn-container">
+                <button class="btn btn-secondary" onclick="prevCard()">Back</button>
+                <button class="btn btn-primary" onclick="nextCard()">Continue</button>
+            </div>
+        </div>
+        
+        <!-- Card 8: Referral Source -->
+        <div class="survey-card" id="card-8">
+            <h2>Almost done!</h2>
+            <p class="subtitle">Just one last thing before we finish</p>
+            
+            <div class="form-group">
+                <label>How did you hear about our health services?</label>
+                <div class="options-container">
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="referral-doctor" name="referral" value="Doctor referral">
+                        <label class="checkbox-label" for="referral-doctor">Doctor referral</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="referral-insurance" name="referral" value="Health insurance provider">
+                        <label class="checkbox-label" for="referral-insurance">Health insurance provider</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="referral-online" name="referral" value="Online health community">
+                        <label class="checkbox-label" for="referral-online">Online health community</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="referral-search" name="referral" value="Medical website/search">
+                        <label class="checkbox-label" for="referral-search">Medical website/search</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="referral-friend" name="referral" value="Friend/family recommendation">
+                        <label class="checkbox-label" for="referral-friend">Friend/family recommendation</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="referral-hospital" name="referral" value="Hospital/clinic signage">
+                        <label class="checkbox-label" for="referral-hospital">Hospital/clinic signage</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="referral-other" name="referral" value="Other">
+                        <label class="checkbox-label" for="referral-other">Other</label>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <div class="checkbox-option">
+                    <input type="checkbox" id="consent" name="consent" required>
+                    <label class="checkbox-label" for="consent">I consent to the use of my data for personalizing my health experience</label>
+                </div>
+            </div>
+            
+            <div class="btn-container">
+                <button class="btn btn-secondary" onclick="prevCard()">Back</button>
+                <button class="btn btn-primary" onclick="completeSurvey()">Complete Health Profile</button>
+            </div>
+        </div>
+        
+        <!-- Card 9: Completion -->
+        <div class="survey-card" id="card-9">
+            <h2>Thank you, <span id="thank-you-name">Sarah</span>!</h2>
+            <p class="subtitle">Your health profile has been customized based on your responses.</p>
+            
+            <div class="summary-section">
+                <h3>Here's your health snapshot:</h3>
+                <ul id="summary-list">
+                    <!-- Dynamically filled -->
+                </ul>
+                
+                <div class="recommendations">
+                    <h4>Recommended Next Steps:</h4>
+                    <p>1. Review your personalized health plan</p>
+                    <p>2. Set up your medication reminders</p>
+                    <p>3. Explore our health education resources</p>
+                </div>
+            </div>
+            
+            <button class="btn btn-primary" onclick="goToDashboard()">View Health Dashboard</button>
+        </div>
+    </div>
+
+    <script>
+        let currentCard = 1;
+        const totalCards = 9;
+        
+        // Initialize the survey
+        document.addEventListener('DOMContentLoaded', function() {
+            updateProgress();
+            
+            // Set the user name from first card input
+            const nameInput = document.getElementById('preferred-name');
+            nameInput.addEventListener('input', function() {
+                document.getElementById('user-name').textContent = this.value || 'Sarah';
+                document.getElementById('thank-you-name').textContent = this.value || 'Sarah';
+            });
+        });
+        
+        function updateProgress() {
+            const progressPercent = ((currentCard - 1) / (totalCards - 2)) * 100;
+            document.getElementById('progress-fill').style.width = `${progressPercent}%`;
+            document.getElementById('progress-text').textContent = `${Math.min(currentCard, totalCards - 1)} of ${totalCards - 1}`;
+        }
+        
+        function nextCard() {
+            if (validateCurrentCard()) {
+                const currentElement = document.getElementById(`card-${currentCard}`);
+                currentElement.classList.remove('active');
+                currentElement.classList.add('leaving');
+                
+                currentCard++;
+                updateProgress();
+                
+                setTimeout(() => {
+                    currentElement.classList.remove('leaving');
+                    document.getElementById(`card-${currentCard}`).classList.add('active');
+                    
+                    // Special handling for summary card
+                    if (currentCard === totalCards) {
+                        generateSummary();
+                    }
+                }, 300);
+            }
+        }
+        
+        function prevCard() {
+            const currentElement = document.getElementById(`card-${currentCard}`);
+            currentElement.classList.remove('active');
+            
+            currentCard--;
+            updateProgress();
+            
+            setTimeout(() => {
+                document.getElementById(`card-${currentCard}`).classList.add('active');
+            }, 10);
+        }
+        
+        function validateCurrentCard() {
+            // Validate required fields on current card
+            if (currentCard === 3) {
+                const checkedInterests = document.querySelectorAll('#card-3 input[type="checkbox"]:checked').length;
+                if (checkedInterests < 3) {
+                    alert('Please select at least 3 health interests');
+                    return false;
+                }
+            }
+            
+            if (currentCard === 8) {
+                if (!document.getElementById('consent').checked) {
+                    alert('Please consent to data usage to continue');
+                    return false;
+                }
+            }
+            
+            return true;
+        }
+        
+        function completeSurvey() {
+            if (validateCurrentCard()) {
+                nextCard();
+            }
+        }
+        
+        function generateSummary() {
+            const summaryList = document.getElementById('summary-list');
+            summaryList.innerHTML = '';
+            
+            // Add summary items based on user selections
+            const name = document.getElementById('preferred-name').value || 'Sarah';
+            const role = document.querySelector('input[name="role"]:checked').value;
+            const experience = document.querySelector('input[name="experience"]:checked').value;
+            
+            // Add static summary items (in real app these would be dynamic)
+            const summaryItems = [
+                `You're a ${role} with ${experience} experience`,
+                'Interested in Nutrition, Exercise, and Chronic Condition Management',
+                'Prefers Light Mode and Daily health reminders',
+                'Main goals: Improve physical fitness and Manage chronic condition(s)'
+            ];
+            
+            summaryItems.forEach(item => {
+                const li = document.createElement('li');
+                li.textContent = item;
+                summaryList.appendChild(li);
+            });
+        }
+        
+        function goToDashboard() {
+            // In a real app, this would redirect to the dashboard
+            alert('Redirecting to your personalized Health Dashboard!');
+            
+            // Here you would collect all form data for submission
+            const formData = {
+                name: document.getElementById('preferred-name').value,
+                role: document.querySelector('input[name="role"]:checked').value,
+                theme: document.querySelector('input[name="theme"]:checked').value,
+                // Add all other form data
+            };
+            
+            console.log('Form data to submit:', formData);
+            // Submit to server would go here
+        }
+    </script>
+</body>
+</html>
