@@ -11,43 +11,70 @@ def home():
     if 'user_id' in session:
         return redirect(url_for('form'))
     return render_template('Home.html')
-
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
-        first_name = request.form['first_name']
-        last_name = request.form['last_name']
-        email = request.form['email']
-        dob = request.form['dob']
-        password = hashlib.sha256(request.form['password'].encode()).hexdigest()
-        agreed = request.form.get('agreed_to_terms') == 'on'
+        try:
+            # Get form data
+            first_name = request.form.get('first_name', '').strip()
+            last_name = request.form.get('last_name', '').strip()
+            email = request.form.get('email', '').strip().lower()
+            dob = request.form.get('dob', '')
+            password = request.form.get('password', '')
+            agreed = request.form.get('agreed_to_terms') == 'on'
 
-        conn = get_db_connection()
-        if conn is None:
-            flash("Database connection failed", "danger")
+            # Basic validation
+            if not all([first_name, last_name, email, dob, password]):
+                flash("All fields are required", "danger")
+                return redirect(url_for('register'))
+            
+            if not agreed:
+                flash("You must agree to the terms", "danger")
+                return redirect(url_for('register'))
+
+            # Hash password
+            password_hash = hashlib.sha256(password.encode()).hexdigest()
+
+            conn = get_db_connection()
+            if conn is None:
+                flash("Database connection failed", "danger")
+                return redirect(url_for('register'))
+            
+            try:
+                cursor = conn.cursor()
+
+                # Check if email exists
+                cursor.execute("SELECT id FROM users WHERE email=%s", (email,))
+                if cursor.fetchone():
+                    flash("Email already registered", "danger")
+                    return redirect(url_for('register'))
+
+                # Insert new user
+                cursor.execute("""
+                    INSERT INTO users (first_name, last_name, email, date_of_birth, password, agreed_to_terms)
+                    VALUES (%s, %s, %s, %s, %s, %s)
+                """, (first_name, last_name, email, dob, password_hash, agreed))
+
+                conn.commit()
+                flash("Registration successful! Please login.", "success")
+                return redirect(url_for('login'))
+
+            except Exception as e:
+                conn.rollback()
+                app.logger.error(f"Database error: {str(e)}")
+                flash("Registration failed due to a server error", "danger")
+                return redirect(url_for('register'))
+                
+            finally:
+                if 'cursor' in locals(): cursor.close()
+                if conn: conn.close()
+
+        except Exception as e:
+            app.logger.error(f"Registration error: {str(e)}")
+            flash("Registration failed", "danger")
             return redirect(url_for('register'))
-        cursor = conn.cursor()
 
-        # Check if email already exists
-        cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
-        if cursor.fetchone():
-            flash("Email already registered", "danger")
-            cursor.close()
-            conn.close()
-            return redirect(url_for('register'))
-
-        cursor.execute("""
-            INSERT INTO users (first_name, last_name, email, date_of_birth, password, agreed_to_terms)
-            VALUES (%s, %s, %s, %s, %s, %s)
-        """, (first_name, last_name, email, dob, password, agreed))
-
-        conn.commit()
-        cursor.close()
-        conn.close()
-
-        flash("Registration successful! Please login.", "success")
-        return redirect(url_for('login'))
-
+    # GET request
     return render_template('register.html')
 
 @app.route('/login', methods=['GET', 'POST'])
