@@ -15,7 +15,7 @@
         :where([class^="ri-"])::before { content: "\f3c2"; }
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f9fafb;
+            background-color: #283c53;
         }
         input:focus {
             outline: none;
@@ -63,23 +63,23 @@
 <body class="min-h-screen flex flex-col justify-center items-center p-4 md:p-6">
     <div class="form-container w-full max-w-md mx-auto bg-white rounded-lg shadow-lg p-6 md:p-8">
         <div class="text-center mb-8">
-            <h1 class="font-['Pacifico'] text-3xl text-primary mb-2">Health Tracker</h1>
+            <h1 class="font-['Pacifico'] text-3xl  mb-2"style="color: #26465c;">SwasthyaSutra</h1>
             <p class="text-gray-600">Welcome back to your health journey</p>
         </div>
         
-        <form class="space-y-6">
+        <form  method="POST" action="{{ url_for('login') }}" class="space-y-6">
             <div class="relative">
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none w-10 h-full">
                     <i class="ri-mail-line text-gray-400"></i>
                 </div>
-                <input type="email" class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded text-gray-900 focus:ring-2 focus:ring-primary/20" placeholder="Email address" required>
+                <input type="email" name="email" class="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-300 rounded text-gray-900 focus:ring-2 focus:ring-primary/20" placeholder="Email address" required>
             </div>
             
             <div class="relative">
                 <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none w-10 h-full">
                     <i class="ri-lock-line text-gray-400"></i>
                 </div>
-                <input type="password" id="password" class="w-full pl-10 pr-10 py-3 bg-gray-50 border border-gray-300 rounded text-gray-900 focus:ring-2 focus:ring-primary/20" placeholder="Password" required>
+                <input type="password" name="password" id="password" class="w-full pl-10 pr-10 py-3 bg-gray-50 border border-gray-300 rounded text-gray-900 focus:ring-2 focus:ring-primary/20" placeholder="Password" required>
                 <div class="absolute inset-y-0 right-0 flex items-center pr-3 w-10 h-full">
                     <i class="ri-eye-line text-gray-400 toggle-password" id="togglePassword"></i>
                 </div>
@@ -93,9 +93,9 @@
                 <a href="#" class="text-sm text-primary hover:text-primary/80 font-medium">Forgot password?</a>
             </div>
             
-            <button type="submit" class="w-full py-3 bg-primary text-white font-medium rounded-button hover:bg-primary/90 transition-colors whitespace-nowrap">
-                Sign in
-            </button>
+           <button type="submit" class="w-full py-3 text-white font-medium rounded-button hover:bg-primary/90 transition-colors whitespace-nowrap" style="background-color: #48687d;">
+    Log in
+</button>
         </form>
         
         <div class="my-6 flex items-center">
@@ -128,18 +128,11 @@
         <div class="mt-8 text-center">
             <p class="text-gray-600">
                 Don't have an account? 
-                <a href="#" class="text-primary font-medium hover:text-primary/80">Sign up</a>
+                <a href="{{ url_for('register') }}" class="text-primary font-medium hover:text-primary/80">Sign up</a>
             </p>
         </div>
     </div>
-    
-    <footer class="w-full max-w-md mx-auto mt-8 text-center text-sm text-gray-500">
-        <div class="flex justify-center space-x-4 mb-2">
-            <a href="#" class="hover:text-gray-700">Terms of Service</a>
-            <a href="#" class="hover:text-gray-700">Privacy Policy</a>
-        </div>
-        <p>© 2025 Health Track. All rights reserved.</p>
-    </footer>
+
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {

@@ -1,198 +1,288 @@
-
-from flask import Flask, render_template, request, redirect, url_for, session, flash
+from flask import Flask, render_template, request, redirect, url_for, session, flash,jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
-
-app = Flask(__name__)
-app.secret_key = 'your_secret_key_here'  # Change this to a random secret key
-
-# Mock database (replace with your actual database)
-users = {}
-
-@app.route('/')
-def home():
-    if 'username' in session:
-        return redirect(url_for('dashboard'))
-    return render_template('index.html')
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    if 'username' in session:
-        return redirect(url_for('dashboard'))
-    
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        
-        if username in users and check_password_hash(users[username]['password'], password):
-            session['username'] = username
-            flash('Login successful!', 'success')
-            return redirect(url_for('dashboard'))
-        else:
-            flash('Invalid username or password', 'danger')
-    
-    return render_template('login.html')
-
-@app.route('/register', methods=['GET', 'POST'])
-def register():
-    if 'username' in session:
-        return redirect(url_for('dashboard'))
-        
-    if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-        
-        if username in users:
-            flash('Username already exists', 'danger')
-        else:
-            users[username] = {
-                'password': generate_password_hash(password)
-            }
-            flash('Registration successful! Please login.', 'success')
-            return redirect(url_for('login'))
-    
-    return render_template('register.html')
-@app.route('/form', methods=['GET', 'POST'])
-def form():
-    if 'username' not in session:  # Add this check
-        return redirect(url_for('login'))
-    
-    if request.method == 'POST':
-        try:
-            # Get form data
-            steps = request.form['steps']
-            sleep = request.form['sleep']
-            water = request.form['water']
-            calories = request.form['calories']
-            mood = request.form['mood']
-            
-            # Validate data
-            if not all([steps, sleep, water, calories, mood]):
-                flash('Please fill all fields', 'error')
-                return redirect(url_for('form'))
-            
-            # Save to database (example using SQLite)
-            conn = sqlite3.connect('health.db')
-            c = conn.cursor()
-            c.execute('''INSERT INTO health_data 
-                        (username, steps, sleep, water, calories, mood, date) 
-                        VALUES (?,?,?,?,?,?,?)''',
-                     (session['username'], steps, sleep, water, calories, mood, datetime.now()))
-            conn.commit()
-            conn.close()
-            
-            flash('Data saved successfully!', 'success')
-            return redirect(url_for('dashboard'))
-            
-        except Exception as e:
-            flash(f'Error saving data: {str(e)}', 'error')
-            return redirect(url_for('form'))
-    
-    return render_template('form.html')
-
-@app.route('/dashboard')
-def dashboard():
-    if 'username' not in session:
-        flash('Please login first', 'danger')
-        return redirect(url_for('login'))
-    
-    return render_template('dashboard.html', username=session['username'])
-
-@app.route('/logout')
-def logout():
-    session.pop('username', None)
-    flash('You have been logged out', 'info')
-    return redirect(url_for('home'))
-
-if __name__ == '__main__':
-    app.run(debug=True)
-
-
-from flask import Flask, render_template, request, redirect, session
-from utils.db import get_db_connection 
-import mysql.connector
+from utils.db import get_db_connection
 import hashlib
-from datetime import date
+from datetime import datetime
+import pickle
+import numpy as np
+import logging
+from flask_cors import CORS
+import os
+from health_model import HealthModel
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
+def generate_recommendations(input_data, health_score):
+    recommendations = []
+    
+    # Sleep recommendations
+    sleep_hours = input_data['sleep_hours']
+    if sleep_hours < 6:
+        recommendations.append({
+            'category': 'Sleep',
+            'message': 'Your sleep duration is very low. Aim for 7-9 hours per night for optimal health.',
+            'priority': 'critical'
+        })
+    elif 6 <= sleep_hours < 7:
+        recommendations.append({
+            'category': 'Sleep',
+            'message': 'Your sleep could improve. Try to get 7-9 hours of quality sleep each night.',
+            'priority': 'high'
+        })
+    
+    # Exercise recommendations
+    exercise_days = input_data['exercise_days']
+    if exercise_days < 2:
+        recommendations.append({
+            'category': 'Exercise',
+            'message': 'You exercise very little. Aim for at least 150 minutes of moderate activity per week.',
+            'priority': 'critical'
+        })
+    elif 2 <= exercise_days < 4:
+        recommendations.append({
+            'category': 'Exercise',
+            'message': 'Consider increasing your activity level to 4-5 days per week for better health.',
+            'priority': 'high'
+        })
+    
+    # Diet recommendations
+    diet_quality = input_data['diet_quality']
+    if diet_quality < 4:
+        recommendations.append({
+            'category': 'Diet',
+            'message': 'Your diet needs significant improvement. Focus on whole foods, fruits and vegetables.',
+            'priority': 'critical'
+        })
+    elif 4 <= diet_quality < 7:
+        recommendations.append({
+            'category': 'Diet',
+            'message': 'Your diet could be healthier. Try to reduce processed foods and increase nutrient density.',
+            'priority': 'high'
+        })
+    
+    # Hydration recommendations
+    water_glasses = input_data['water_glasses']
+    if water_glasses < 4:
+        recommendations.append({
+            'category': 'Hydration',
+            'message': 'You seem dehydrated. Aim for 6-8 glasses of water daily.',
+            'priority': 'high'
+        })
+    elif 4 <= water_glasses < 6:
+        recommendations.append({
+            'category': 'Hydration',
+            'message': 'Your hydration is okay but could improve. Try drinking more water throughout the day.',
+            'priority': 'medium'
+        })
+    
+    # Stress recommendations
+    stress_level = input_data['stress_level']
+    if stress_level >= 8:
+        recommendations.append({
+            'category': 'Stress',
+            'message': 'Your stress levels are very high. Consider meditation, deep breathing, or professional help.',
+            'priority': 'critical'
+        })
+    elif 6 <= stress_level < 8:
+        recommendations.append({
+            'category': 'Stress',
+            'message': 'Your stress levels are elevated. Try relaxation techniques or reducing stressors.',
+            'priority': 'high'
+        })
+    
+    # BMI/Weight recommendations
+    bmi = input_data['weight_kg'] / ((input_data['height_cm']/100) ** 2)
+    bmi_category = HealthModel.calculate_bmi_category(bmi)
+    if bmi_category in ['Underweight', 'Obese']:
+        recommendations.append({
+            'category': 'Weight',
+            'message': f'Your BMI indicates {bmi_category}. Consider consulting a nutritionist for personalized advice.',
+            'priority': 'critical'
+        })
+    elif bmi_category == 'Overweight':
+        recommendations.append({
+            'category': 'Weight',
+            'message': 'Your BMI indicates you may be overweight. Small dietary changes can make a big difference.',
+            'priority': 'high'
+        })
+    
+    # General recommendations
+    if health_score < 50:
+        recommendations.append({
+            'category': 'General',
+            'message': 'Your overall health needs significant attention. Consider a comprehensive health checkup.',
+            'priority': 'critical'
+        })
+    elif 50 <= health_score < 70:
+        recommendations.append({
+            'category': 'General',
+            'message': 'Your health is fair but has room for improvement. Focus on one area at a time.',
+            'priority': 'high'
+        })
+    
+    return recommendations
+
+
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'
+app.config['TEMPLATES_AUTO_RELOAD'] = True
+health_model = HealthModel()
 
-
-
+# Combined application routes
 @app.route('/')
 def home():
     if 'user_id' in session:
-        return redirect('/log')
-    return redirect('/login')
+        return redirect(url_for('html_page'))  # Changed from dashboard to html_page
+    return render_template('Home.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    conn = get_db_connection()
-    if not conn:
-        return "Database connection failed"
-    cursor = conn.cursor(dictionary=True)
+    if 'user_id' in session:
+        return redirect(url_for('html_page'))  # Redirect to html.html if already logged in
     
-
     if request.method == 'POST':
-        username = request.form['username']
-        password = hashlib.sha256(request.form['password'].encode()).hexdigest()
+        email = request.form.get('email')
+        password = request.form.get('password')
         
-        cursor.execute("SELECT * FROM users WHERE username=%s AND password=%s", (username, password))
-        user = cursor.fetchone()
+        if not email or not password:
+            flash('Email and password are required', 'danger')
+            return redirect(url_for('login'))
+        
+        conn = get_db_connection()
+        if not conn:
+            flash("Database connection failed", "danger")
+            return redirect(url_for('login'))
+            
+        cursor = conn.cursor(dictionary=True)
+        try:
+            cursor.execute("SELECT * FROM register WHERE email = %s", (email,))
+            user = cursor.fetchone()
 
-        if user:
-            session['user_id'] = user['id']
-            return redirect('/log')
-        else:
-            return "Invalid credentials"
-
+            if user and check_password_hash(user['password'], password):
+                session['user_id'] = user['id']
+                session['email'] = user['email']
+                session['first_name'] = user.get('first_name', 'User')
+                return redirect(url_for('html_page'))  # Redirect to html.html after login
+            else:
+                flash('Invalid email or password', 'danger')
+        except Exception as e:
+            flash(f"Login error: {str(e)}", "danger")
+        finally:
+            cursor.close()
+            conn.close()
+    
     return render_template('login.html')
-     
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
+    if 'user_id' in session:
+        return redirect(url_for('html_page'))  # Redirect to html.html if already logged in
+        
     if request.method == 'POST':
-        username = request.form['username']
-        password = hashlib.sha256(request.form['password'].encode()).hexdigest()
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        email = request.form.get('email')
+        dob = request.form.get('date_of_birth')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
+        
+        if not all([first_name, last_name, email, dob, password, confirm_password]):
+            flash('All fields are required', 'danger')
+            return redirect(url_for('register'))
 
-        cursor.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, password))
-        conn.commit()
-        return redirect('/login')
+        if password != confirm_password:
+            flash('Passwords do not match', 'danger')
+            return redirect(url_for('register'))
 
+        hashed_password = generate_password_hash(password)
+
+        conn = get_db_connection()
+        if not conn:
+            flash("Database connection failed", "danger")
+            return redirect(url_for('register'))
+            
+        cursor = conn.cursor()
+        try:
+            cursor.execute("SELECT id FROM register WHERE email=%s", (email,))
+            if cursor.fetchone():
+                flash('Email already exists', 'danger')
+                return redirect(url_for('register'))
+            
+            cursor.execute(
+                """INSERT INTO register 
+                (first_name, last_name, email, date_of_birth, password) 
+                VALUES (%s, %s, %s, %s, %s)""",
+                (first_name, last_name, email, dob, hashed_password)
+            )
+            conn.commit()
+            flash('Registration successful! Please login.', 'success')
+            return redirect(url_for('login'))
+        except Exception as e:
+            conn.rollback()
+            flash(f'Registration error: {str(e)}', 'danger')
+        finally:
+            cursor.close()
+            conn.close()
+    
     return render_template('register.html')
 
-@app.route('/log', methods=['GET', 'POST'])
-def log():
+# New route to serve html.html
+@app.route('/tracker')
+def html_page():
     if 'user_id' not in session:
-        return redirect('/login')
+        flash('Please login first', 'danger')
+        return redirect(url_for('login'))
+    return render_template('tracker.html')
 
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    if request.method == 'POST':
-        steps = request.form['steps']
-        sleep = request.form['sleep']
-        water = request.form['water']
-        calories = request.form['calories']
-        mood = request.form['mood']
-
-        cursor.execute("""INSERT INTO daily_logs (user_id, log_date, steps, sleep_hours, water_intake, calories, mood)
-                          VALUES (%s, %s, %s, %s, %s, %s, %s)""",
-                       (session['user_id'], date.today(), steps, sleep, water, calories, mood))
-        conn.commit()
-        return "Log saved successfully!"
-
-    return render_template('form.html')
-
-@app.route('/logout')
+@app.route('/api/predict', methods=['POST'])
+def predict():
+    try:
+        input_data = request.get_json()
+        
+        features = {
+            'age': float(input_data['age']),
+            'gender': input_data['gender'],
+            'weight_kg': float(input_data['weight_kg']),
+            'height_cm': float(input_data['height_cm']),
+            'sleep_hours': float(input_data['sleep_hours']),
+            'water_glasses': float(input_data['water_glasses']),
+            'diet_quality': float(input_data['diet_quality']),
+            'exercise_days': float(input_data['exercise_days']),
+            'stress_level': float(input_data['stress_level'])
+        }
+        
+        health_score = health_model.predict_health(features)
+        health_score = max(0, min(100, round(health_score, 1)))
+        
+        bmi = features['weight_kg'] / ((features['height_cm']/100) ** 2)
+        recommendations = generate_recommendations(features, health_score)
+        
+        response = {
+            'result': {
+                'score': health_score,
+                'status': HealthModel.get_health_status(health_score),
+                'timestamp': datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+                'metrics': {
+                    'bmi': round(bmi, 1),
+                    'bmi_category': HealthModel.calculate_bmi_category(bmi),
+                    'sleep_hours': features['sleep_hours'],
+                    'exercise_days': features['exercise_days'],
+                    'water_glasses': features['water_glasses']
+                },
+                'recommendations': recommendations
+            }
+        }
+        
+        return jsonify(response)
+    
+    except Exception as e:
+        return jsonify({'error': str(e)}), 400      
+@app.route('/logout', methods=['POST'])
 def logout():
     session.clear()
-    return redirect('/login')
+    return jsonify({'message': 'Logged out'}), 200
 
 if __name__ == '__main__':
-   app.run(debug=True, host='127.0.0.1', port=5000)
-
-
-
+    app.run(debug=True, host='127.0.0.1', port=5000)
